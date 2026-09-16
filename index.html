@@ -6,14 +6,57 @@
     <title>Вікторина</title>
 </head>
 <body>
-    <!-- Шапка з назвою -->
+    <header>
+        <h1>Вікторина</h1>
+        <nav>
+            <a href="#question">Питання</a>
+            <a href="#results">Результати</a>
+        </nav>
+    </header>
 
-    <!-- Блок поточного питання й варіантів відповіді -->
+    <main>
+    
+        <section id="question">
+            <h2>Поточне питання</h2>
+            <!-- Заглушка для картинки з обов'язковим атрибутом alt -->
+            <img src="assets/img/placeholder.jpg" alt="Ілюстрація до поточного питання вікторини">
+    
+            <form>
+                <p>Яке місто є столицею Австрії?</p>
+        
+                <div>
+                    <input type="radio" id="answer-vienna" name="capital" value="vienna">
+                    <label for="answer-vienna">Відень</label>
+                </div>
+        
+                <div>
+                    <input type="radio" id="answer-berlin" name="capital" value="berlin">
+                    <label for="answer-berlin">Берлін</label>
+                </div>
+            </form>
+        </section>
 
-    <!-- Блок прогресу проходження -->
+        <section id="results">
+            <h2>Історія спроб</h2>
+        
+            <article>
+                <h3>Спроба: 15 вересня</h3>
+                <p>Результат: 8/10 правильних відповідей</p>
+            </article>
 
-    <!-- Блок результатів/історії спроб -->
+            <article>
+                <h3>Спроба: 16 вересня</h3>
+                <p>Результат: 10/10 правильних відповідей</p>
+            </article>
 
-    <!-- Підвал -->
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026. Навчальний проєкт з дисципліни "Вебпрограмування".</p>
+        <p>Розроблено студенткою 2-го курсу ФІОТ кафедри ІПІ на спеціальності ІПЗ, КПІ ім. Ігоря Сікорського.</p>
+    </footer>
+
 </body>
 </html>
