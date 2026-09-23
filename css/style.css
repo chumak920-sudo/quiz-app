@@ -1,0 +1,111 @@
+/* Глобальний reset */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    font-size: 1rem; /* Стандартний розмір тексту */
+    line-height: 1.5; /* Множник для зручного читання */
+    color: #333333; /* Темно-сірий колір тексту для контрасту */
+    background-color: #f3e3ff; /* Дуже світлий фіолетовий фон сторінки */
+}
+
+header {
+    background-color: #5e17eb; /* Енергійний фіолетовий фон */
+    padding: 24px 32px;
+    border-bottom: 5px solid #ffde59; /* Жовтий акцентний кордон знизу */
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    color: #ffffff; /* Білий текст */
+    letter-spacing: 2px;
+}
+
+header nav {
+    margin-top: 16px;
+}
+
+header nav a {
+    color: #ffde59; /* Жовтий колір посилань */
+    text-decoration: none; /* Прибираємо підкреслення */
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-right: 24px; /* Відступ між пунктами */
+}
+
+/* Прибираємо відступ у останнього посилання, щоб блок був рівним */
+header nav a:last-child {
+    margin-right: 0;
+}
+
+/* Ефект при наведенні миші на посилання */
+header nav a:hover {
+    color: #ffffff;
+}
+
+main {
+    max-width: 800px; /* Обмежуємо ширину, щоб рядок не був надто довгим */
+    margin: 0 auto; /* Центрування блоку по горизонталі */
+    padding: 32px 16px; /* Відступи по краях екрана */
+}
+
+section {
+    margin-bottom: 48px; /* Відстань між секціями Питання та Історія */
+}
+
+/* Картка питання */
+#question {
+    background-color: #ffffff;
+    padding: 32px; /* Великий відступ */
+    border-radius: 12px; /* Заокруглені кути */
+    text-align: center; /* Центрування тексту */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Легка тінь для об'єму */
+}
+
+#question img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+
+.answer-option {
+    display: block; /* Розтягує label на всю доступну ширину */
+    background-color: #f4f4f4;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.answer-option:hover {
+    background-color: #ffde59; /* Жовтий hover-ефект зміни фону */
+}
+
+.card {
+    background-color: #ffffff;
+    padding: 10px; /* Компактніший розмір за завданням */
+    border: 1px solid #e0e0e0;
+    border-left: 4px solid #5e17eb; /* Фіолетовий акцент зліва */
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+/* Забираємо зайвий відступ у заголовків карток */
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+footer {
+    padding: 32px 16px;
+    font-size: 0.875rem; /* Зменшений розмір шрифту */
+    color: #777777; /* Приглушений сірий колір тексту */
+    text-align: center;
+    border-top: 1px solid #eeeeee; /* Візуальне відокремлення від основного контенту */
+}

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вікторина</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header>
@@ -24,27 +25,28 @@
             <form>
                 <p>Яке місто є столицею Австрії?</p>
         
-                <div>
+                <!-- Тепер label — це і є весь жовтий блок -->
+                <label class="answer-option" for="answer-vienna">
                     <input type="radio" id="answer-vienna" name="capital" value="vienna">
-                    <label for="answer-vienna">Відень</label>
-                </div>
-        
-                <div>
+                    Відень
+                </label>
+
+                <label class="answer-option" for="answer-berlin">
                     <input type="radio" id="answer-berlin" name="capital" value="berlin">
-                    <label for="answer-berlin">Берлін</label>
-                </div>
+                    Берлін
+                </label>
             </form>
         </section>
 
         <section id="results">
             <h2>Історія спроб</h2>
         
-            <article>
+            <article class="card">
                 <h3>Спроба: 15 вересня</h3>
                 <p>Результат: 8/10 правильних відповідей</p>
             </article>
 
-            <article>
+            <article class="card">
                 <h3>Спроба: 16 вересня</h3>
                 <p>Результат: 10/10 правильних відповідей</p>
             </article>
