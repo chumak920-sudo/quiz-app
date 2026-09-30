@@ -25,31 +25,47 @@
             <form>
                 <p>Яке місто є столицею Австрії?</p>
         
-                <!-- Тепер label — це і є весь жовтий блок -->
-                <label class="answer-option" for="answer-vienna">
-                    <input type="radio" id="answer-vienna" name="capital" value="vienna">
-                    Відень
-                </label>
+                <div class="answers-group">
+                    <label class="answer-option" for="answer-vienna">
+                        <input type="radio" id="answer-vienna" name="capital" value="vienna">
+                        Відень
+                    </label>
 
-                <label class="answer-option" for="answer-berlin">
-                    <input type="radio" id="answer-berlin" name="capital" value="berlin">
-                    Берлін
-                </label>
+                    <label class="answer-option" for="answer-berlin">
+                        <input type="radio" id="answer-berlin" name="capital" value="berlin">
+                        Берлін
+                    </label>
+                </div>
+
             </form>
+
         </section>
 
         <section id="results">
             <h2>Історія спроб</h2>
         
-            <article class="card">
-                <h3>Спроба: 15 вересня</h3>
-                <p>Результат: 8/10 правильних відповідей</p>
-            </article>
+            <div class="cards">
+                <article class="card">
+                    <h3>Спроба: 15 вересня</h3>
+                    <p>Результат: 8/10 правильних відповідей</p>
+                </article>
 
-            <article class="card">
-                <h3>Спроба: 16 вересня</h3>
-                <p>Результат: 10/10 правильних відповідей</p>
-            </article>
+                <article class="card">
+                    <h3>Спроба: 16 вересня</h3>
+                    <p>Результат: 10/10 правильних відповідей</p>
+                </article>
+        
+                <!-- Додаємо третю і четверту картку для перевірки -->
+                <article class="card">
+                    <h3>Спроба: 17 вересня</h3>
+                    <p>Результат: 9/10 правильних відповідей</p>
+                </article>
+
+                <article class="card">
+                    <h3>Спроба: 18 вересня</h3>
+                    <p>Результат: 10/10 правильних відповідей</p>
+                </article>
+            </div>
 
         </section>
 

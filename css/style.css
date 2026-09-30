@@ -13,37 +13,38 @@ body {
 }
 
 header {
-    background-color: #5e17eb; /* Енергійний фіолетовий фон */
+    background-color: #5e17eb;
     padding: 24px 32px;
-    border-bottom: 5px solid #ffde59; /* Жовтий акцентний кордон знизу */
-    text-align: center;
+    border-bottom: 5px solid #ffde59;
+    
+    display: flex; /* Робить контейнер header flex-контейнером */
+    justify-content: space-between; /* Розносить логотип і меню по краях */
+    align-items: center; /* Вирівнює елементи по вертикалі */
+    flex-wrap: wrap; /* Дозволяє елементам переноситися на новий рядок */
+    gap: 16px; /* Відступ між елементами */
 }
 
 header h1 {
     margin: 0;
     font-size: 2.5rem;
-    color: #ffffff; /* Білий текст */
+    color: #ffffff;
     letter-spacing: 2px;
 }
 
+/* Налаштування блоку навігації через Flexbox */
 header nav {
-    margin-top: 16px;
+    display: flex; /* Вишиковуємо посилання в ряд */
+    flex-wrap: wrap; /* Дозволяємо перенесення */
+    gap: 24px; /* Задаємо відступ між посиланнями через gap замість margin */
 }
 
 header nav a {
-    color: #ffde59; /* Жовтий колір посилань */
-    text-decoration: none; /* Прибираємо підкреслення */
+    color: #ffde59;
+    text-decoration: none;
     font-size: 1.1rem;
     font-weight: bold;
-    margin-right: 24px; /* Відступ між пунктами */
 }
 
-/* Прибираємо відступ у останнього посилання, щоб блок був рівним */
-header nav a:last-child {
-    margin-right: 0;
-}
-
-/* Ефект при наведенні миші на посилання */
 header nav a:hover {
     color: #ffffff;
 }
@@ -108,4 +109,62 @@ footer {
     color: #777777; /* Приглушений сірий колір тексту */
     text-align: center;
     border-top: 1px solid #eeeeee; /* Візуальне відокремлення від основного контенту */
+}
+
+/* --- МОБІЛЬНІ (БАЗОВІ) СТИЛІ --- */
+
+/* Контейнер для варіантів відповідей */
+.answers-group {
+    display: flex;
+    flex-direction: column; /* Стовпчик кнопок на всю ширину */
+    gap: 8px; /* Відступ між кнопками */
+}
+
+.answer-option {
+    background-color: #f4f4f4;
+    padding: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: block; 
+}
+
+/* Галерея карток історії на Grid */
+.cards {
+    display: grid; /* Вмикаємо CSS Grid */
+    grid-template-columns: 1fr; /* Одна колонка для мобільного екрана */
+    gap: 16px; /* Відступ між картками */
+}
+
+/* --- Обмеження ширини зображень --- */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* --- ПЛАНШЕТ (ширина екрана від 600px) --- */
+@media (min-width: 600px) {
+    /* Переводимо варіанти відповідей у сітку з 2 колонок */
+    .answers-group {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Загальне правило: збільшуємо кількість колонок для карток історії до двох */
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* --- ДЕСКТОП (ширина екрана від 1024px) --- */
+@media (min-width: 1024px) {
+    /* Картка питання центрована з обмеженою шириною (max-width) */
+    #question {
+        max-width: 700px;
+        margin: 0 auto; /* Центрування по горизонталі */
+    }
+
+    /* Збільшуємо кількість колонок карток історії до 3 */
+    .cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
