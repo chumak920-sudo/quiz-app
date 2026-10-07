@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вікторина</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -18,27 +21,36 @@
     <main>
     
         <section id="question">
-            <h2>Поточне питання</h2>
-            <!-- Заглушка для картинки з обов'язковим атрибутом alt -->
-            <img src="assets/img/vienna.png" alt="Панорамний вид на місто Відень">
+            <!-- Блок прогресу для "захопливості" -->
+            <div class="quiz-header">
+                <span class="question-number">Питання 1/10</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" style="width: 10%;"></div>
+                </div>
+            </div>
     
-            <form>
-                <p>Яке місто є столицею Австрії?</p>
+            <h2>Поточне питання</h2>
+            <img src="assets/img/vienna.png" alt="Панорамний вид на місто Відень">
         
+            <form>
+                <p class="question-text">Яке місто є столицею Австрії?</p>
+            
                 <div class="answers-group">
-                    <label class="answer-option" for="answer-vienna">
-                        <input type="radio" id="answer-vienna" name="capital" value="vienna">
-                        Відень
+                    <!-- Правильна відповідь із текстовим індикатором -->
+                    <label class="answer-option is-correct" for="answer-vienna">
+                        <input type="radio" id="answer-vienna" name="capital" value="vienna" checked>
+                        <span class="answer-text">Відень</span>
+                        <span class="status-indicator">✓ Правильно</span>
                     </label>
 
-                    <label class="answer-option" for="answer-berlin">
-                        <input type="radio" id="answer-berlin" name="capital" value="berlin">
-                        Берлін
+                    <!-- Неправильна відповідь для прикладу -->
+                    <label class="answer-option is-incorrect" for="answer-berlin">
+                        <input type="radio" id="answer-berlin" name="capital" value="berlin" disabled>
+                        <span class="answer-text">Берлін</span>
+                        <span class="status-indicator">✗ Неправильно</span>
                     </label>
                 </div>
-
             </form>
-
         </section>
 
         <section id="results">

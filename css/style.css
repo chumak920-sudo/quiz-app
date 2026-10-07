@@ -5,11 +5,16 @@
 
 body {
     margin: 0;
-    font-family: system-ui, sans-serif;
-    font-size: 1rem; /* Стандартний розмір тексту */
-    line-height: 1.5; /* Множник для зручного читання */
-    color: #333333; /* Темно-сірий колір тексту для контрасту */
-    background-color: #f3e3ff; /* Дуже світлий фіолетовий фон сторінки */
+    font-family: 'Open Sans', system-ui, sans-serif; /* Новий шрифт для тексту */
+    font-size: 1rem; 
+    line-height: 1.5; 
+    color: #333333; 
+    background-color: #f3e3ff; 
+}
+
+/* Задаємо шрифт для всіх заголовків */
+h1, h2, h3 {
+    font-family: 'Montserrat', sans-serif;
 }
 
 header {
@@ -17,11 +22,11 @@ header {
     padding: 24px 32px;
     border-bottom: 5px solid #ffde59;
     
-    display: flex; /* Робить контейнер header flex-контейнером */
-    justify-content: space-between; /* Розносить логотип і меню по краях */
-    align-items: center; /* Вирівнює елементи по вертикалі */
-    flex-wrap: wrap; /* Дозволяє елементам переноситися на новий рядок */
-    gap: 16px; /* Відступ між елементами */
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    flex-wrap: wrap; 
+    gap: 16px;
 }
 
 header h1 {
@@ -33,9 +38,9 @@ header h1 {
 
 /* Налаштування блоку навігації через Flexbox */
 header nav {
-    display: flex; /* Вишиковуємо посилання в ряд */
+    display: flex; 
     flex-wrap: wrap; /* Дозволяємо перенесення */
-    gap: 24px; /* Задаємо відступ між посиланнями через gap замість margin */
+    gap: 24px;
 }
 
 header nav a {
@@ -62,9 +67,9 @@ section {
 /* Картка питання */
 #question {
     background-color: #ffffff;
-    padding: 32px; /* Великий відступ */
+    padding: 32px;
     border-radius: 12px; /* Заокруглені кути */
-    text-align: center; /* Центрування тексту */
+    text-align: center;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Легка тінь для об'єму */
 }
 
@@ -82,10 +87,13 @@ section {
     border-radius: 6px;
     cursor: pointer;
     text-align: left;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .answer-option:hover {
     background-color: #ffde59; /* Жовтий hover-ефект зміни фону */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .card {
@@ -95,6 +103,17 @@ section {
     border-left: 4px solid #5e17eb; /* Фіолетовий акцент зліва */
     border-radius: 6px;
     margin-bottom: 12px;
+}
+
+/* Додаємо легку тінь та ефект при наведенні для карток історії */
+.card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px); /* Картка злегка "підстрибує" */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Тінь стає більшою */
 }
 
 /* Забираємо зайвий відступ у заголовків карток */
@@ -139,6 +158,61 @@ footer {
 img {
     max-width: 100%;
     height: auto;
+}
+
+/* Обґрунтування нечіткої вимоги: додаємо яскравий номер питання (великий, жирний шрифт) 
+   та помітний жовтий прогрес-бар, щоб візуалізувати рух вперед і мотивувати користувача */
+.quiz-header {
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.question-number {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #5e17eb; /* Основний фіолетовий */
+    display: block;
+    margin-bottom: 8px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 12px;
+    background-color: #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: #ffde59; /* Яскравий акцент прогресу */
+}
+
+.question-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+/* Чітка вимога: Правильна/неправильна відповідь з контрастом >= 4.5:1 */
+.answer-option.is-correct {
+    background-color: #e8f5e9; /* Блідо-зелений фон */
+    border: 2px solid #1b5e20; /* Темно-зелена рамка */
+    color: #1b5e20; /* Темно-зелений текст */
+}
+
+.answer-option.is-incorrect {
+    background-color: #ffebee; /* Блідо-червоний фон */
+    border: 2px solid #b71c1c; /* Темно-червона рамка */
+    color: #b71c1c; /* Темно-червоний текст */
+    opacity: 0.8;
+}
+
+/* Розташовуємо текстовий індикатор статусу праворуч */
+.status-indicator {
+    float: right;
+    font-weight: bold;
 }
 
 /* --- ПЛАНШЕТ (ширина екрана від 600px) --- */
