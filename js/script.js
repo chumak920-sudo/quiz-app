@@ -1,5 +1,36 @@
 console.log('script.js підключено');
 
+// Знаходимо першу статичну картку історії спроб і видаляємо її програмно
+const staticCard = document.querySelector('.card');
+if (staticCard) {
+    staticCard.remove();
+}
+
+// Знаходимо наші елементи на сторінці, щоб JavaScript міг з ними працювати
+const listContainer = document.querySelector('#questions-list');
+const questionsCountElement = document.querySelector('#questions-count');
+
+// --- Функція рендеру списку ---
+function renderQuestions(questions) {
+    // Очищуємо контейнер на випадок, якщо там вже щось було
+    listContainer.innerHTML = ''; 
+
+    // Крок 4: Проходимо масив циклом
+    for (const item of questions) {
+        
+        // Крок 5: Створюємо елемент li та заповнюємо його текстом питання
+        const liItem = document.createElement('li');
+        liItem.textContent = item.question;
+        
+        // Крок 6: Додаємо атрибут із правильною відповіддю та клас
+        liItem.setAttribute('data-answer', item.answer);
+        liItem.classList.add('answered'); 
+        
+        // Крок 7: Додаємо готовий елемент у контейнер на сторінці
+        listContainer.append(liItem);
+    }
+}
+
 // Створюємо константу (масив об'єктів), яка зберігає питання та відповіді до них
 const quizData = [
     { question: "Яке місто є столицею Австрії?", answer: "Відень" },
@@ -40,3 +71,9 @@ const calcScorePercent = (correctCount, total) => Math.round(correctCount / tota
 // Викликаємо стрілкову функцію з реальними даними та виводимо результат у консоль
 const myScore = calcScorePercent(8, 10);
 console.log(`\nТвій результат: ${myScore}% правильних відповідей!`);
+
+// Викликаємо функцію, передаючи їй наш масив quizData
+renderQuestions(quizData);
+
+// Змінюємо текст лічильника, використовуючи довжину масиву (length)
+questionsCountElement.textContent = `Кількість питань: ${quizData.length}`;
