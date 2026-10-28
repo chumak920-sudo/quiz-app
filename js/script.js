@@ -79,7 +79,6 @@ renderQuestions(quizData);
 questionsCountElement.textContent = `Кількість питань: ${quizData.length}`;
 
 // --- Обробка подій, форми та валідація ---
-
 const quizForm = document.querySelector("#quiz-form");
 const radioButtons = quizForm.querySelectorAll('input[name="user-answer"]');
 const nextQuestionBtn = document.querySelector("#next-question-btn");
@@ -98,7 +97,7 @@ function clearAnswerStyles() {
   });
 }
 
-// Обробник відправки форми: перевіряє відповідь, підсвічує кнопку, додає запис і перемальовує список
+// Обробник відправки форми
 quizForm.addEventListener("submit", (event) => {
   // Скасовуємо перезавантаження сторінки
   event.preventDefault();
