@@ -33,36 +33,32 @@
             <h2>Поточне питання</h2>
             <img src="assets/img/vienna.png" alt="Панорамний вид на місто Відень">
         
-            <form>
+            <form id="quiz-form">
                 <p class="question-text">Яке місто є столицею Австрії?</p>
             
                 <div class="answers-group">
-                    <!-- Правильна відповідь із текстовим індикатором -->
-                    <label class="answer-option is-correct" for="answer-vienna">
-                        <input type="radio" id="answer-vienna" name="capital" value="vienna" checked>
+                    <label class="answer-option" for="answer-vienna">
+                        <input type="radio" id="answer-vienna" name="user-answer" value="Відень" required>
                         <span class="answer-text">Відень</span>
-                        <span class="status-indicator">✓ Правильно</span>
+                        <span class="status-indicator"></span>
                     </label>
-
-                    <!-- Неправильна відповідь для прикладу -->
-                    <label class="answer-option is-incorrect" for="answer-berlin">
-                        <input type="radio" id="answer-berlin" name="capital" value="berlin" disabled>
+                
+                    <label class="answer-option" for="answer-berlin">
+                        <input type="radio" id="answer-berlin" name="user-answer" value="Берлін" required>
                         <span class="answer-text">Берлін</span>
-                        <span class="status-indicator">✗ Неправильно</span>
+                        <span class="status-indicator"></span>
                     </label>
                 </div>
+
+                <button type="submit" style="margin-top: 16px; padding: 8px 16px;">Перевірити відповідь</button>
+                <button type="button" id="next-question-btn" style="margin-top: 16px; padding: 8px 16px;">Наступне питання</button>
             </form>
         </section>
 
         <section id="all-questions">
             <h2>Список питань вікторини</h2>
-        
             <p id="questions-count">Кількість питань: 0</p>
-    
-            <!-- Контейнер для нашого списку -->
-            <ul id="questions-list">
-                
-            </ul>
+            <ul id="questions-list"></ul>
         </section>
 
         <section id="results">
