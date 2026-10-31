@@ -10,46 +10,68 @@ if (staticCard) {
 const listContainer = document.querySelector("#questions-list");
 const questionsCountElement = document.querySelector("#questions-count");
 
-// --- Функція рендеру списку ---
+// Масив об'єктів питань: кожне питання має свої варіанти (options) та індекс правильної відповіді (correctIndex)
+const quizData = [
+  {
+    question: "Яке місто є столицею Австрії?",
+    options: ["Відень", "Берлін"],
+    correctIndex: 0,
+    answer: "Відень",
+    answered: false,
+    userAnswer: "",
+    isCorrect: false,
+  },
+  {
+    question: "Скільки кольорів у веселці?",
+    options: ["5", "7"],
+    correctIndex: 1,
+    answer: "7",
+    answered: false,
+    userAnswer: "",
+    isCorrect: false,
+  },
+  {
+    question: "Яка планета третя від Сонця?",
+    options: ["Марс", "Земля"],
+    correctIndex: 1,
+    answer: "Земля",
+    answered: false,
+    userAnswer: "",
+    isCorrect: false,
+  },
+];
+
+// Окремий масив для збереження результатів спроб
+const quizResults = [];
+
+// --- Функція рендеру списку питань ---
 function renderQuestions(questions) {
-  // Очищуємо контейнер на випадок, якщо там вже щось було
   listContainer.innerHTML = "";
 
-  // Крок 4: Проходимо масив циклом
   for (const item of questions) {
-    // Крок 5: Створюємо елемент li та заповнюємо його текстом питання
     const liItem = document.createElement("li");
-    liItem.textContent = item.question;
-
-    // Крок 6: Додаємо атрибут із правильною відповіддю та клас
     liItem.setAttribute("data-answer", item.answer);
-    liItem.classList.add("answered");
 
-    // Крок 7: Додаємо готовий елемент у контейнер на сторінці
+    if (item.answered) {
+      liItem.classList.add("answered");
+      liItem.textContent = `${item.question} — Відповідь: "${item.userAnswer}" (${item.isCorrect ? "правильно" : "неправильно"})`;
+    } else {
+      liItem.textContent = item.question;
+    }
+
     listContainer.append(liItem);
   }
 }
 
-// Створюємо константу (масив об'єктів), яка зберігає питання та відповіді до них
-const quizData = [
-  { question: "Яке місто є столицею Австрії?", answer: "Відень" },
-  { question: "Скільки кольорів у веселці?", answer: "7" },
-  { question: "Яка планета третя від Сонця?", answer: "Земля" },
-];
-
 // Функція обробляє масив питань і перевіряє тестову відповідь користувача
 function checkQuizAnswers() {
-  // Жорстко задана відповідь користувача для тестування умови
   const userAnswer = "Відень";
 
   console.log("--- Аналіз питань вікторини ---");
 
-  // Використовуємо цикл for...of для перебору нашого масиву
   for (const item of quizData) {
-    // Виводимо кожне питання в консоль
     console.log(`Питання: ${item.question}`);
 
-    // Порівнюємо строго відповідь користувача з правильною відповіддю (item.answer)
     if (userAnswer === item.answer) {
       console.log("Результат: правильно ✅");
     } else {
@@ -58,24 +80,16 @@ function checkQuizAnswers() {
   }
 }
 
-// Викликаємо функцію
 checkQuizAnswers();
 
-/*
-calcScorePercent приймає кількість правильних відповідей (correctCount) та 
-загальну кількість питань (total) і повертає округлений відсоток успішності
-*/
 const calcScorePercent = (correctCount, total) =>
   Math.round((correctCount / total) * 100);
 
-// Викликаємо стрілкову функцію з реальними даними та виводимо результат у консоль
 const myScore = calcScorePercent(8, 10);
 console.log(`\nТвій результат: ${myScore}% правильних відповідей!`);
 
-// Викликаємо функцію рендеру, передаючи їй наш масив quizData
+// Початковий рендер списку питань та лічильника
 renderQuestions(quizData);
-
-// Змінюємо текст лічильника, використовуючи довжину масиву (length)
 questionsCountElement.textContent = `Кількість питань: ${quizData.length}`;
 
 // --- Обробка подій, форми та валідація ---
@@ -83,6 +97,8 @@ const quizForm = document.querySelector("#quiz-form");
 const radioButtons = quizForm.querySelectorAll('input[name="user-answer"]');
 const nextQuestionBtn = document.querySelector("#next-question-btn");
 const formQuestionText = quizForm.querySelector(".question-text");
+const questionNumberText = document.querySelector(".question-number");
+const progressBarFill = document.querySelector(".progress-bar-fill");
 let currentQuestionIndex = 0;
 
 // Допоміжна функція для скидання зеленої/червоної підсвітки кнопок
@@ -97,13 +113,45 @@ function clearAnswerStyles() {
   });
 }
 
+// Функція виведення поточного питання та його варіантів відповідей у радіокнопки
+function renderCurrentQuestion() {
+  const currentQuestion = quizData[currentQuestionIndex];
+
+  formQuestionText.textContent = currentQuestion.question;
+
+  if (questionNumberText) {
+    questionNumberText.textContent = `Питання ${currentQuestionIndex + 1}/${quizData.length}`;
+  }
+  if (progressBarFill) {
+    const progressPercent = Math.round(
+      ((currentQuestionIndex + 1) / quizData.length) * 100
+    );
+    progressBarFill.style.width = `${progressPercent}%`;
+  }
+
+  // Підставляємо варіанти відповідей поточного питання в радіокнопки
+  radioButtons.forEach((radio, index) => {
+    const optionValue = currentQuestion.options[index];
+    radio.value = optionValue;
+    const label = radio.closest(".answer-option");
+    const answerTextSpan = label.querySelector(".answer-text");
+    if (answerTextSpan) {
+      answerTextSpan.textContent = optionValue;
+    }
+  });
+
+  clearAnswerStyles();
+  quizForm.reset();
+}
+
+// Ініціалізуємо перше питання при завантаженні
+renderCurrentQuestion();
+
 // Обробник відправки форми
 quizForm.addEventListener("submit", (event) => {
-  // Скасовуємо перезавантаження сторінки
   event.preventDefault();
   clearAnswerStyles();
 
-  // Зчитуємо значення полів та перевіряємо chosenIndex === correctIndex
   let chosenIndex = -1;
   let userAnswer = "";
   let chosenLabel = null;
@@ -116,8 +164,9 @@ quizForm.addEventListener("submit", (event) => {
     }
   });
 
-  const correctIndex = 0; // Перший варіант ("Відень") є правильним
-  const isCorrect = chosenIndex === correctIndex;
+  // Перевіряємо відповідь відносно correctIndex ПОТОЧНОГО питання
+  const currentQuestion = quizData[currentQuestionIndex];
+  const isCorrect = chosenIndex === currentQuestion.correctIndex;
   console.log(isCorrect ? "Правильно! ✅" : "Неправильно ❌");
 
   // Динамічно додаємо зелену або червону підсвітку обраній кнопці
@@ -132,33 +181,32 @@ quizForm.addEventListener("submit", (event) => {
     }
   }
 
-  // Збираємо новий об'єкт і додаємо в масив методом push
-  const newQuestionRecord = {
-    question: `Перевірено відповідь: "${userAnswer}" (${isCorrect ? "правильно" : "неправильно"})`,
+  // Зберігаємо результат перевірки для поточного питання та додаємо запис в окремий масив quizResults
+  currentQuestion.answered = true;
+  currentQuestion.userAnswer = userAnswer;
+  currentQuestion.isCorrect = isCorrect;
+
+  quizResults.push({
+    question: currentQuestion.question,
     answer: userAnswer,
-  };
-  quizData.push(newQuestionRecord);
+    isCorrect: isCorrect,
+  });
 
-  // Перемальовуємо список та оновлюємо лічильник
+  // Перемальовуємо список питань та оновлюємо підсумок
   renderQuestions(quizData);
-  questionsCountElement.textContent = `Кількість питань: ${quizData.length}`;
-
-  // Очищуємо вибір радіокнопок після успішного додавання
-  quizForm.reset();
+  questionsCountElement.textContent = `Кількість питань: ${quizData.length} (перевірено: ${quizResults.length})`;
 });
 
 // --- Додаткова клієнтська валідація ---
 radioButtons.forEach((radio) => {
-  // Якщо користувач натиснув кнопку без вибору відповіді — задаємо повідомлення помилки
   radio.addEventListener("invalid", () => {
     if (!quizForm.querySelector('input[name="user-answer"]:checked')) {
       radio.setCustomValidity(
-        "Будь ласка, оберіть один із варіантів відповіді!",
+        "Будь ласка, оберіть один із варіантів відповіді!"
       );
     }
   });
 
-  // На подію change скидаємо помилку валідації та попередню підсвітку
   radio.addEventListener("change", () => {
     clearAnswerStyles();
     radioButtons.forEach((btn) => btn.setCustomValidity(""));
@@ -168,15 +216,9 @@ radioButtons.forEach((radio) => {
 
 // --- Друга подія варіанта (click по кнопці «Наступне питання») ---
 nextQuestionBtn.addEventListener("click", () => {
-  // Перемикаємо по колу індекс на наступне питання з масиву quizData
   currentQuestionIndex = (currentQuestionIndex + 1) % quizData.length;
-
-  // Оновлюємо текст питання над радіокнопками
-  formQuestionText.textContent = `Поточне питання (${currentQuestionIndex + 1}/${quizData.length}): ${quizData[currentQuestionIndex].question}`;
-
-  // Скидаємо кольорову підсвітку та вибрану радіокнопку
-  clearAnswerStyles();
-  quizForm.reset();
-
-  console.log(`Переключено на питання: ${quizData[currentQuestionIndex].question}`);
+  renderCurrentQuestion();
+  console.log(
+    `Переключено на питання: ${quizData[currentQuestionIndex].question}`
+  );
 });
