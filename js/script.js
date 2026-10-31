@@ -164,7 +164,7 @@ quizForm.addEventListener("submit", (event) => {
     }
   });
 
-  // Перевіряємо відповідь відносно correctIndex ПОТОЧНОГО питання
+  // Перевіряємо відповідь відносно correctIndex поточного питання
   const currentQuestion = quizData[currentQuestionIndex];
   const isCorrect = chosenIndex === currentQuestion.correctIndex;
   console.log(isCorrect ? "Правильно! ✅" : "Неправильно ❌");
@@ -194,7 +194,11 @@ quizForm.addEventListener("submit", (event) => {
 
   // Перемальовуємо список питань та оновлюємо підсумок
   renderQuestions(quizData);
-  questionsCountElement.textContent = `Кількість питань: ${quizData.length} (перевірено: ${quizResults.length})`;
+  const answeredCount = quizData.filter((item) => item.answered).length;
+  questionsCountElement.textContent = `Кількість питань: ${quizData.length} (перевірено: ${answeredCount})`;
+
+  // Очищуємо форму після успішного додавання
+  quizForm.reset();
 });
 
 // --- Додаткова клієнтська валідація ---
