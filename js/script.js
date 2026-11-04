@@ -226,3 +226,90 @@ nextQuestionBtn.addEventListener("click", () => {
     `Переключено на питання: ${quizData[currentQuestionIndex].question}`
   );
 });
+
+// --- Клієнт для відомого API (Open Trivia Database) ---
+// Крок 2-3: Створюємо async-функцію запиту, виконуємо fetch і чекаємо відповідь
+// Джерело даних: https://opentdb.com/api.php?amount=10&type=multiple
+const API_URL = "https://opentdb.com/api.php?amount=10&type=multiple";
+
+async function loadQuizData() {
+  showLoading(true);
+
+  try {
+    const response = await fetch(API_URL);
+
+    // Перевіряємо HTTP-статус відповіді
+    if (!response.ok) {
+      throw new Error(`Сервер відповів кодом ${response.status}`);
+    }
+
+    // Розбираємо тіло відповіді як JSON
+    const data = await response.json();
+    console.log("Отримані дані з API:", data);
+
+    // Адаптуємо поля results[].question, correct_answer, incorrect_answers
+    // та виводимо отримані дані в DOM через функцію рендеру з практикуму 7
+    const apiQuestions = data.results.map((item) => {
+      const cleanQuestion = decodeHtmlEntities(item.question);
+      const cleanCorrect = decodeHtmlEntities(item.correct_answer);
+      const cleanIncorrect = item.incorrect_answers
+        .map((ans) => decodeHtmlEntities(ans))
+        .join(", ");
+
+      return {
+        question: `${cleanQuestion} (Правильна: ${cleanCorrect} | Неправильні: ${cleanIncorrect})`,
+        answer: cleanCorrect,
+      };
+    });
+
+    renderQuestions(apiQuestions);
+    questionsCountElement.textContent = `Кількість питань: ${apiQuestions.length}`;
+  } catch (error) {
+    // Обробляємо помилку (повідомлення на сторінці + деталі в консоль)
+    if (errorMessage) {
+      errorMessage.textContent =
+        "Не вдалося завантажити питання вікторини. Перевірте з'єднання та спробуйте ще раз.";
+      errorMessage.hidden = false;
+    }
+    console.error("Помилка під час завантаження даних з API:", error);
+  } finally {
+    // Вимикаємо стан завантаження в блоці finally незалежно від результату
+    showLoading(false);
+  }
+}
+
+// --- Допоміжні елементи та функції для Кроків 6-7 ---
+const loadingMessage = document.querySelector("#loading-message");
+const errorMessage = document.querySelector("#error-message");
+const reloadBtn = document.querySelector("#reload-btn");
+
+// Розкодування HTML-сутностей (&quot;, &#039;, &amp; тощо) для Кроку 6
+function decodeHtmlEntities(text) {
+  const textArea = document.createElement("textarea");
+  textArea.innerHTML = text;
+  return textArea.value;
+}
+
+// Керування індикатором завантаження для Кроку 7
+function showLoading(isLoading) {
+  if (loadingMessage) {
+    loadingMessage.hidden = !isLoading;
+  }
+  if (reloadBtn) {
+    reloadBtn.disabled = isLoading;
+  }
+  if (isLoading && errorMessage) {
+    errorMessage.hidden = true;
+    errorMessage.textContent = "";
+  }
+}
+
+// Прив'язуємо повторний виклик loadQuizData() до кнопки «Оновити»
+if (reloadBtn) {
+  reloadBtn.addEventListener("click", () => {
+    loadQuizData();
+  });
+}
+
+// Запускаємо завантаження даних при відкритті сторінки
+loadQuizData();
