@@ -45,6 +45,9 @@ const quizData = [
 const quizResults = [];
 
 // --- Функція рендеру списку питань ---
+// Крок 7 (Практикум 10): Ручний DOM-рендер закоментовано, оскільки відображення списку
+// та підрахунок балів тепер виконує реактивний компонент Vue 3 <quiz-question>.
+/*
 function renderQuestions(questions) {
   listContainer.innerHTML = "";
 
@@ -62,6 +65,7 @@ function renderQuestions(questions) {
     listContainer.append(liItem);
   }
 }
+*/
 
 // Функція обробляє масив питань і перевіряє тестову відповідь користувача
 function checkQuizAnswers() {
@@ -88,9 +92,9 @@ const calcScorePercent = (correctCount, total) =>
 const myScore = calcScorePercent(8, 10);
 console.log(`\nТвій результат: ${myScore}% правильних відповідей!`);
 
-// Початковий рендер списку питань та лічильника
-renderQuestions(quizData);
-questionsCountElement.textContent = `Кількість питань: ${quizData.length}`;
+// Початковий рендер списку питань та лічильника (замінено на Vue у Практикумі 10)
+// renderQuestions(quizData);
+// questionsCountElement.textContent = `Кількість питань: ${quizData.length}`;
 
 // --- Обробка подій, форми та валідація ---
 const quizForm = document.querySelector("#quiz-form");
@@ -192,10 +196,10 @@ quizForm.addEventListener("submit", (event) => {
     isCorrect: isCorrect,
   });
 
-  // Перемальовуємо список питань та оновлюємо підсумок
-  renderQuestions(quizData);
-  const answeredCount = quizData.filter((item) => item.answered).length;
-  questionsCountElement.textContent = `Кількість питань: ${quizData.length} (перевірено: ${answeredCount})`;
+  // Перемальовуємо список питань та оновлюємо підсумок (замінено на Vue у Практикумі 10)
+  // renderQuestions(quizData);
+  // const answeredCount = quizData.filter((item) => item.answered).length;
+  // questionsCountElement.textContent = `Кількість питань: ${quizData.length} (перевірено: ${answeredCount})`;
 
   // Очищуємо форму після успішного додавання
   quizForm.reset();
@@ -262,8 +266,9 @@ async function loadQuizData() {
       };
     });
 
-    renderQuestions(apiQuestions);
-    questionsCountElement.textContent = `Кількість питань: ${apiQuestions.length}`;
+    // Ручний рендер у #questions-list вимкнено у Практикумі 10, щоб не перезаписувати Vue-компонент
+    // renderQuestions(apiQuestions);
+    // questionsCountElement.textContent = `Кількість питань: ${apiQuestions.length}`;
   } catch (error) {
     // Обробляємо помилку (повідомлення на сторінці + деталі в консоль)
     if (errorMessage) {
@@ -313,3 +318,89 @@ if (reloadBtn) {
 
 // Запускаємо завантаження даних при відкритті сторінки
 loadQuizData();
+
+// Переносимо масив питань варіанта та лічильник балів у реактивний стан data()
+const app = Vue.createApp({
+  data() {
+    return {
+      score: 0,
+      questions: [
+        {
+          id: 1,
+          question: "Яке місто є столицею Австрії?",
+          options: ["Відень", "Берлін"],
+          correctIndex: 0,
+          answered: false,
+          userAnswer: "",
+          isCorrect: false,
+        },
+        {
+          id: 2,
+          question: "Скільки кольорів у веселці?",
+          options: ["5", "7"],
+          correctIndex: 1,
+          answered: false,
+          userAnswer: "",
+          isCorrect: false,
+        },
+        {
+          id: 3,
+          question: "Яка планета третя від Сонця?",
+          options: ["Марс", "Земля"],
+          correctIndex: 1,
+          answered: false,
+          userAnswer: "",
+          isCorrect: false,
+        },
+      ],
+    };
+  },
+  // Обробка події answer(selectedIndex) у батьківському компоненті
+  methods: {
+    checkAnswer(questionId, selectedIndex) {
+      const item = this.questions.find((q) => q.id === questionId);
+      if (!item) return;
+
+      // Якщо раніше вже була правильна відповідь, знімаємо попередній бал при перевиборі
+      if (item.answered && item.isCorrect) {
+        this.score--;
+      }
+
+      item.answered = true;
+      item.userAnswer = item.options[selectedIndex];
+      item.isCorrect = selectedIndex === item.correctIndex;
+
+      if (item.isCorrect) {
+        this.score++;
+      }
+    },
+  },
+});
+
+// Окремий компонент QuizQuestion із props, рендером v-for та подією $emit('answer', selectedIndex)
+app.component("quiz-question", {
+  props: ["question", "options", "correctIndex", "answered", "userAnswer", "isCorrect"],
+  emits: ["answer"],
+  template: `
+    <li :class="{ answered: answered }" style="margin-bottom: 12px;">
+      <strong>{{ question }}</strong>
+      <div style="margin-top: 6px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <button
+          v-for="(option, index) in options"
+          :key="index"
+          type="button"
+          @click="$emit('answer', index)"
+          style="padding: 4px 12px; cursor: pointer;"
+        >
+          {{ option }}
+        </button>
+        <span v-if="answered" :style="{ color: isCorrect ? '#2e7d32' : '#c62828', fontWeight: '600' }">
+          — Відповідь: "{{ userAnswer }}" ({{ isCorrect ? 'правильно ✓' : 'неправильно ✗' }})
+        </span>
+      </div>
+    </li>
+  `,
+});
+
+// Монтуємо Vue-застосунок у секцію списку питань
+app.mount("#vue-quiz-app");

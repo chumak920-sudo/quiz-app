@@ -8,6 +8,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+
+    <!-- Крок 1-2: Підключення фреймворку Vue 3 через CDN без збірки.
+         Обрано фреймворк Vue 3, оскільки він підключається одним CDN-скриптом без компіляції Babel
+         та забезпечує зручний декларативний рендеринг через директиву v-for і систему подій $emit. -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
     <script src="js/script.js" defer></script>
 </head>
 <body>
@@ -59,8 +65,26 @@
             <button type="button" id="reload-btn" style="margin-bottom: 12px; padding: 8px 16px;">Оновити</button>
             <p id="loading-message" hidden>Завантаження питань з сервера...</p>
             <p id="error-message" style="color: #c62828; font-weight: 600;" hidden></p>
-            <p id="questions-count">Кількість питань: 0</p>
-            <ul id="questions-list"></ul>
+
+            <!-- Контейнер реактивного компонента Vue 3 (Практикум 10) -->
+            <div id="vue-quiz-app">
+                <p id="questions-count">
+                    Кількість питань: {{ questions.length }} | Набрано балів: <strong>{{ score }}</strong> / {{ questions.length }}
+                </p>
+                <ul id="questions-list">
+                    <quiz-question
+                        v-for="item in questions"
+                        :key="item.id"
+                        :question="item.question"
+                        :options="item.options"
+                        :correct-index="item.correctIndex"
+                        :answered="item.answered"
+                        :user-answer="item.userAnswer"
+                        :is-correct="item.isCorrect"
+                        @answer="(selectedIndex) => checkAnswer(item.id, selectedIndex)"
+                    ></quiz-question>
+                </ul>
+            </div>
         </section>
 
         <section id="results">
