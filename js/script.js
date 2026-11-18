@@ -404,3 +404,239 @@ app.component("quiz-question", {
 
 // Монтуємо Vue-застосунок у секцію списку питань
 app.mount("#vue-quiz-app");
+
+// --- Локальні сховища даних ---
+
+// Модель даних результатів проходжень квізу (id, date, score, total)
+const STORAGE_KEY = "quizResultsStorage";
+const resultsContainer = document.querySelector("#results .cards");
+
+const defaultQuizHistory = [
+  { id: 1, date: "16 вересня", score: 10, total: 10 },
+  { id: 2, date: "17 вересня", score: 9, total: 10 },
+  { id: 3, date: "15 вересня", score: 8, total: 10 },
+];
+
+// Збереження та читання даних із localStorage з обробкою помилок у try/catch
+function saveToLocalStorage(items) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+}
+
+function loadFromLocalStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (error) {
+    console.error("Пошкоджені дані в localStorage:", error);
+    return [];
+  }
+}
+
+// Функція рендеру карток найкращих результатів (сортування за спаданням score)
+function renderResultsHistory(resultsList) {
+  if (!resultsContainer) return;
+  resultsContainer.innerHTML = "";
+
+  const sortedResults = [...resultsList].sort((a, b) => b.score - a.score);
+
+  for (const item of sortedResults) {
+    const card = document.createElement("article");
+    card.classList.add("card");
+    card.innerHTML = `
+      <h3>Спроба: ${item.date}</h3>
+      <p>Результат: <strong>${item.score}/${item.total}</strong> правильних відповідей</p>
+    `;
+    resultsContainer.append(card);
+  }
+}
+
+// Ініціалізуємо початкові дані в localStorage, якщо сховище ще порожнє
+let savedHistory = loadFromLocalStorage();
+if (savedHistory.length === 0) {
+  savedHistory = defaultQuizHistory;
+  saveToLocalStorage(savedHistory);
+}
+renderResultsHistory(savedHistory);
+
+// Прив'язуємо збереження результату до дій користувача (після перевірки відповіді/завершення квізу)
+quizForm.addEventListener("submit", () => {
+  // Рахуємо поточний результат за всіма перевіреними питаннями
+  const answeredQuestions = quizData.filter((q) => q.answered);
+  const currentScore = answeredQuestions.filter((q) => q.isCorrect).length;
+
+  // Коли користувач відповів на всі питання квізу - зберігаємо спробу в localStorage
+  if (answeredQuestions.length === quizData.length) {
+    const currentHistory = loadFromLocalStorage();
+    const nextId =
+      currentHistory.length > 0
+        ? Math.max(...currentHistory.map((item) => item.id)) + 1
+        : 1;
+    const newResult = {
+      id: nextId,
+      date: new Date().toLocaleDateString("uk-UA", {
+        day: "numeric",
+        month: "long",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      score: currentScore,
+      total: quizData.length,
+    };
+
+    currentHistory.push(newResult);
+    saveToLocalStorage(currentHistory);
+    renderResultsHistory(currentHistory);
+    console.log("Результат квізу збережено в localStorage:", newResult);
+  }
+});
+
+// Проєктуємо схему IndexedDB (назва бази "QuizDB", версія 1, сховище "results", keyPath "id", autoIncrement: true)
+const DB_NAME = "QuizDB";
+const DB_VERSION = 1;
+const STORE_NAME = "results";
+
+// Реалізуємо openDB() з обробником onupgradeneeded для створення сховища
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
+        console.log(`Об'єктне сховище "${STORE_NAME}" успішно створено.`);
+      }
+    };
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// Реалізуємо CRUD-функції addItem та getAllItems через транзакції readwrite/readonly
+async function addItem(resultItem) {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      tx.objectStore(STORE_NAME).put(resultItem);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (error) {
+    console.error("Помилка під час додавання запису в IndexedDB:", error);
+  }
+}
+
+async function getAllItems() {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readonly");
+      const request = tx.objectStore(STORE_NAME).getAll();
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  } catch (error) {
+    console.error("Помилка під час читання з IndexedDB:", error);
+    return [];
+  }
+}
+
+// Виконуємо одноразову міграцію з localStorage у IndexedDB при першому запуску
+async function migrateFromLocalStorage() {
+  const isMigrated = localStorage.getItem("dbMigrated");
+  if (isMigrated) return;
+
+  try {
+    const localDataRaw = localStorage.getItem("quizResultsStorage");
+    if (localDataRaw) {
+      const localItems = JSON.parse(localDataRaw);
+      const dbItems = await getAllItems();
+
+      if (dbItems.length === 0 && localItems.length > 0) {
+        for (const item of localItems) {
+          // Видаляємо старий ручний id, щоб IndexedDB згенерувала його автоматично через autoIncrement
+          const { id, ...itemWithoutId } = item;
+          await addItem(itemWithoutId);
+        }
+        console.log("Успішна міграція даних із localStorage в IndexedDB!");
+      }
+    }
+    localStorage.setItem("dbMigrated", "true");
+  } catch (error) {
+    console.error("Помилка під час міграції даних:", error);
+  }
+}
+
+// Функція рендеру карток найкращих результатів на сторінці
+function renderResultsHistory(resultsList) {
+  if (!resultsContainer) return;
+  resultsContainer.innerHTML = "";
+
+  const sortedResults = [...resultsList].sort((a, b) => b.score - a.score);
+
+  for (const item of sortedResults) {
+    const card = document.createElement("article");
+    card.classList.add("card");
+    card.innerHTML = `
+      <h3>Спроба: ${item.date} (ID: ${item.id})</h3>
+      <p>Результат: <strong>${item.score}/${item.total}</strong> правильних відповідей</p>
+    `;
+    resultsContainer.append(card);
+  }
+}
+
+// Переводимо первинний рендер на асинхронне читання даних з IndexedDB
+async function initResults() {
+  await migrateFromLocalStorage();
+  const items = await getAllItems();
+  
+  // Якщо база взагалі порожня - додаємо дефолтні спроби для краси
+  if (items.length === 0) {
+    const defaults = [
+      { date: "16 вересня", score: 10, total: 10 },
+      { date: "17 вересня", score: 9, total: 10 },
+      { date: "15 вересня", score: 8, total: 10 },
+    ];
+    for (const d of defaults) {
+      await addItem(d);
+    }
+    renderResultsHistory(await getAllItems());
+  } else {
+    renderResultsHistory(items);
+  }
+}
+
+initResults();
+
+// Оновлюємо обробник форми: після завершення квізу зберігаємо результат в IndexedDB та обробляємо помилки
+quizForm.addEventListener("submit", async () => {
+  const answeredQuestions = quizData.filter((q) => q.answered);
+  const currentScore = answeredQuestions.filter((q) => q.isCorrect).length;
+
+  if (answeredQuestions.length === quizData.length) {
+    const newResult = {
+      date: new Date().toLocaleDateString("uk-UA", {
+        day: "numeric",
+        month: "long",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      score: currentScore,
+      total: quizData.length,
+    };
+
+    try {
+      await addItem(newResult);
+      const updatedItems = await getAllItems();
+      renderResultsHistory(updatedItems);
+      console.log("Результат успішно збережено в IndexedDB:", newResult);
+    } catch (error) {
+      // Обробка помилки відкриття/запису бази (наприклад, у режимі приватного перегляду)
+      console.error("IndexedDB недоступна:", error);
+      alert("Не вдалося зберегти результат: сховище IndexedDB заблоковане або недоступне.");
+    }
+  }
+});
+
