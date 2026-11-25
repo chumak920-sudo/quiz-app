@@ -640,3 +640,117 @@ quizForm.addEventListener("submit", async () => {
   }
 });
 
+// --- Анімований таймер зворотного відліку на Canvas ---
+
+// Отримуємо <canvas> та 2D-контекст для малювання
+const timerCanvas = document.querySelector("#quiz-timer");
+const timerCtx = timerCanvas ? timerCanvas.getContext("2d") : null;
+
+// Функція розрахунку ліміту часу на основі даних масиву quizData
+function getQuestionTimeLimit() {
+  const currentQuestion = quizData[currentQuestionIndex];
+  const optionsCount = currentQuestion ? currentQuestion.options.length : 2;
+  return optionsCount * 5; // 5 секунд на кожен варіант відповіді (для 2 варіантів = 10 с)
+}
+
+// Функція відображення поточного стану таймера через ctx.arc()
+function drawTimer(remainingTime, totalTime) {
+  if (!timerCtx || !timerCanvas) return;
+
+  const centerX = timerCanvas.width / 2;
+  const centerY = timerCanvas.height / 2;
+  const radius = Math.min(centerX, centerY) - 10;
+  const progress = Math.max(0, remainingTime / totalTime);
+
+  // Очищуємо полотно перед перемальовуванням кадру
+  timerCtx.clearRect(0, 0, timerCanvas.width, timerCanvas.height);
+
+  // Фонове сіре кільце
+  timerCtx.beginPath();
+  timerCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  timerCtx.strokeStyle = "#e0e0e0";
+  timerCtx.lineWidth = 8;
+  timerCtx.stroke();
+
+  // Активна дуга, що зменшується щокадру (починається зверху: -Math.PI / 2)
+  const startAngle = -Math.PI / 2;
+  const endAngle = startAngle + Math.PI * 2 * progress;
+
+  timerCtx.beginPath();
+  timerCtx.arc(centerX, centerY, radius, startAngle, endAngle);
+  timerCtx.strokeStyle = progress > 0.3 ? "#6200ea" : "#c62828";
+  timerCtx.lineWidth = 8;
+  timerCtx.lineCap = "round";
+  timerCtx.stroke();
+
+  // Текст із залишком секунд у центрі кола
+  timerCtx.fillStyle = "#222222";
+  timerCtx.font = "bold 20px Montserrat, sans-serif";
+  timerCtx.textAlign = "center";
+  timerCtx.textBaseline = "middle";
+  timerCtx.fillText(`${Math.ceil(remainingTime)} с`, centerX, centerY);
+}
+
+// Цикл анімації через requestAnimationFrame
+let timerAnimationId = null;
+let timerStartTime = null;
+let currentTotalTime = getQuestionTimeLimit();
+
+function animateTimer(timestamp) {
+  if (!timerStartTime) {
+    timerStartTime = timestamp;
+  }
+
+  const elapsedSeconds = (timestamp - timerStartTime) / 1000;
+  const remainingTime = Math.max(0, currentTotalTime - elapsedSeconds);
+
+  drawTimer(remainingTime, currentTotalTime);
+
+  if (remainingTime > 0) {
+    timerAnimationId = requestAnimationFrame(animateTimer);
+  } else {
+    stopTimer();
+    console.log("Час на відповідь вичерпано!");
+  }
+}
+
+function startTimer() {
+  stopTimer();
+  currentTotalTime = getQuestionTimeLimit();
+  timerStartTime = null;
+  drawTimer(currentTotalTime, currentTotalTime);
+  timerAnimationId = requestAnimationFrame(animateTimer);
+}
+
+function stopTimer() {
+  if (timerAnimationId !== null) {
+    cancelAnimationFrame(timerAnimationId);
+    timerAnimationId = null;
+  }
+}
+
+// Запускаємо таймер при відкритті сторінки
+startTimer();
+
+// Прив'язуємо анімацію таймера до реальних дій користувача
+quizForm.addEventListener("submit", () => {
+  stopTimer();
+  console.log("Таймер зупинено після відправки відповіді.");
+});
+
+nextQuestionBtn.addEventListener("click", () => {
+  startTimer();
+  console.log("Таймер перезапущено для нового питання.");
+});
+
+// Коректне завершення анімації при переході на іншу вкладку або закритті сторінки
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    stopTimer();
+    console.log("Вкладку приховано — анімацію зупинено через cancelAnimationFrame.");
+  }
+});
+
+window.addEventListener("beforeunload", () => {
+  stopTimer();
+});
